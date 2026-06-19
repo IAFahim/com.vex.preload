@@ -1,0 +1,21 @@
+{
+  "name": "com.vex.preload",
+  "displayName": "Vex Preload",
+  "version": "0.1.0",
+  "description": "Auto-injects the required host/subscene setup so designers (and AI-generated scenes) never ship a scene missing 'Required In Scene' / 'Required In Subscene', and transparently wraps a standalone subscene in a throwaway host when Play is pressed. Gated by a single main-toolbar toggle. Complements BovineLabs.Core's SubScene toolbar.",
+  "unity": "6000.3",
+  "dependencies": {
+    "com.bovinelabs.core": "0.0.0",
+    "com.unity.entities": "6.6.0"
+  },
+  "author": {
+    "name": "Vex"
+  },
+  "keywords": [
+    "editor",
+    "subscene",
+    "dots",
+    "workflow",
+    "designer"
+  ]
+}
