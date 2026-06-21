@@ -90,12 +90,17 @@ namespace Vex.Preload.Editor
                 return;
             }
 
-            var needHost = (sceneClass == SceneClass.Host || sceneClass == SceneClass.Blank) && !PreloadInjector.HasHost(active);
-            var needSubscene = LoadedSubscenesMissingContent().Count > 0;
-            if (needHost || needSubscene)
+            if (NeedsRepair(active, sceneClass))
             {
                 Schedule(active.path, ModeRepair);
             }
+        }
+
+        // A loaded scene that should host but doesn't, or any loaded subscene whose content is missing, needs a repair.
+        private static bool NeedsRepair(Scene active, SceneClass sceneClass)
+        {
+            var needHost = (sceneClass == SceneClass.Host || sceneClass == SceneClass.Blank) && !PreloadInjector.HasHost(active);
+            return needHost || LoadedSubscenesMissingContent().Count > 0;
         }
 
         private static void Schedule(string path, string mode)
@@ -171,24 +176,7 @@ namespace Vex.Preload.Editor
                 {
                     foreach (var subScene in root.GetComponentsInChildren<SubScene>(true))
                     {
-                        if (subScene.SceneAsset == null)
-                        {
-                            continue;
-                        }
-
-                        var path = AssetDatabase.GetAssetPath(subScene.SceneAsset);
-                        if (!seen.Add(path))
-                        {
-                            continue;
-                        }
-
-                        if (PreloadSettings.Instance.IsExcluded(path))
-                        {
-                            continue;
-                        }
-
-                        var scene = EditorSceneManager.GetSceneByPath(path);
-                        if (scene.IsValid() && scene.isLoaded && !PreloadInjector.HasContent(scene))
+                        if (TryGetMissingContentScene(subScene, seen, out var scene))
                         {
                             result.Add(scene);
                         }
@@ -197,6 +185,26 @@ namespace Vex.Preload.Editor
             }
 
             return result;
+        }
+
+        // True only the first time we see a non-excluded, loaded subscene that is still missing its required content.
+        private static bool TryGetMissingContentScene(SubScene subScene, HashSet<string> seen, out Scene scene)
+        {
+            scene = default;
+
+            if (subScene.SceneAsset == null)
+            {
+                return false;
+            }
+
+            var path = AssetDatabase.GetAssetPath(subScene.SceneAsset);
+            if (!seen.Add(path) || PreloadSettings.Instance.IsExcluded(path))
+            {
+                return false;
+            }
+
+            scene = EditorSceneManager.GetSceneByPath(path);
+            return scene.IsValid() && scene.isLoaded && !PreloadInjector.HasContent(scene);
         }
 
         private static void BuildHostAndPlay()

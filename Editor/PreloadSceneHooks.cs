@@ -26,12 +26,7 @@ namespace Vex.Preload.Editor
 
         private static void MaybeInject(Scene scene)
         {
-            if (!PreloadState.Enabled || EditorApplication.isPlayingOrWillChangePlaymode || !scene.IsValid())
-            {
-                return;
-            }
-
-            if (PreloadPlayGuard.IsBuilding || PreloadPlayGuard.IsTempHost(scene))
+            if (!ShouldConsider(scene))
             {
                 return;
             }
@@ -51,6 +46,18 @@ namespace Vex.Preload.Editor
                 ? " New scene — link a SubScene next (Vex > Preload > Create paired subscene)."
                 : string.Empty;
             Debug.Log($"[Preload] '{SceneName(scene)}' was missing Required In Scene — added it for you.{hint}");
+        }
+
+        // A scene is only a candidate for injection when preload is on, we are not entering/exiting play, the scene is
+        // real, and we are not in the middle of building (or looking at) the temp host.
+        private static bool ShouldConsider(Scene scene)
+        {
+            if (!PreloadState.Enabled || EditorApplication.isPlayingOrWillChangePlaymode || !scene.IsValid())
+            {
+                return false;
+            }
+
+            return !PreloadPlayGuard.IsBuilding && !PreloadPlayGuard.IsTempHost(scene);
         }
 
         private static string SceneName(Scene scene)
