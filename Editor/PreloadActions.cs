@@ -44,18 +44,33 @@ namespace Vex.Preload.Editor
             }
 
             // Build the subscene's scene additively, drop the Content prefab in, and save it as the new asset.
+            // Suppress the scene hooks while we author this scene: the additive NewScene synchronously raises
+            // EditorSceneManager.newSceneCreated, and the brand-new empty scene classifies as Blank — without this
+            // PreloadSceneHooks would inject the Required-In-Scene HOST prefab into what is about to become subscene
+            // CONTENT, producing a paired subscene that carries both a host stage and the content stage.
             var content = PreloadSettings.Instance.contentPrefab;
-            var sub = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
-            if (content != null)
+            SceneAsset asset;
+            var settings = PreloadSettings.Instance;
+            var wasEnabled = settings.enabled;
+            settings.enabled = false;
+            try
             {
-                PrefabUtility.InstantiatePrefab(content, sub);
+                var sub = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+                if (content != null)
+                {
+                    PrefabUtility.InstantiatePrefab(content, sub);
+                }
+
+                EditorSceneManager.SaveScene(sub, path);
+                asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+
+                // Close the loose scene — the SubScene component owns its load/edit lifecycle from here.
+                EditorSceneManager.CloseScene(sub, true);
             }
-
-            EditorSceneManager.SaveScene(sub, path);
-            var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-
-            // Close the loose scene — the SubScene component owns its load/edit lifecycle from here.
-            EditorSceneManager.CloseScene(sub, true);
+            finally
+            {
+                settings.enabled = wasEnabled;
+            }
 
             // Link it into the host as an auto-loading SubScene.
             var go = new GameObject(Path.GetFileNameWithoutExtension(path));

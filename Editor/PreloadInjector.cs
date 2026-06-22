@@ -71,15 +71,21 @@ namespace Vex.Preload.Editor
             }
 
             var root = PrefabUtility.LoadPrefabContents(path);
-            var marker = root.GetComponent<PreloadMarker>();
-            if (marker == null)
+            try
             {
-                marker = root.AddComponent<PreloadMarker>();
-            }
+                var marker = root.GetComponent<PreloadMarker>();
+                if (marker == null)
+                {
+                    marker = root.AddComponent<PreloadMarker>();
+                }
 
-            marker.Kind = kind;
-            PrefabUtility.SaveAsPrefabAsset(root, path);
-            PrefabUtility.UnloadPrefabContents(root);
+                marker.Kind = kind;
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
         }
     }
 }

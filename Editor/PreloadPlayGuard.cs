@@ -222,6 +222,15 @@ namespace Vex.Preload.Editor
                 return;
             }
 
+            // NewScene(Single) below discards every open scene — including the content scene the user just pressed Play
+            // from — without prompting. Give them the chance to save (or cancel the whole wrap) so unsaved edits survive.
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                SessionState.EraseString(ContentKey);
+                SessionState.EraseString(ModeKey);
+                return;
+            }
+
             IsBuilding = true;
             try
             {
@@ -255,6 +264,13 @@ namespace Vex.Preload.Editor
             if (!FindTempHost().IsValid())
             {
                 CleanupAsset();
+                return;
+            }
+
+            // The NewScene/OpenScene calls below replace the open scene(s) wholesale. Prompt first so any unsaved edits
+            // (e.g. work done on the temp host) are not silently lost; on cancel, leave everything intact and bail.
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
                 return;
             }
 

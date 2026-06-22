@@ -83,10 +83,16 @@ namespace Vex.Preload.Editor
 
             foreach (var root in scene.GetRootGameObjects())
             {
-                var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(root);
-                if (source != null && AssetDatabase.GetAssetPath(source) == prefabPath)
+                // Recurse into children to match ContainsKind: a designer can parent the injected
+                // instance under another GameObject so it is no longer a scene root. Checking only
+                // roots would miss it and trigger a duplicate injection on the next scene open.
+                foreach (var transform in root.GetComponentsInChildren<Transform>(true))
                 {
-                    return true;
+                    var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(transform.gameObject);
+                    if (source != null && AssetDatabase.GetAssetPath(source) == prefabPath)
+                    {
+                        return true;
+                    }
                 }
             }
 

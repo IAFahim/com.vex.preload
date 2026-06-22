@@ -20,31 +20,45 @@ namespace Vex.Preload.Editor.Tests
 
         private SceneSetup[] originalSetup;
         private bool originalEnabled;
+        private bool enabledToggled;
 
         [SetUp]
         public void SetUp()
         {
-            this.originalEnabled = PreloadSettings.Instance.enabled;
-            PreloadSettings.Instance.enabled = false;
-
             // Capture the real scene setup so we can put it back. Empty when the runner is on an untitled scene.
             this.originalSetup = EditorSceneManager.GetSceneManagerSetup();
             this.World = new PreloadTestWorld();
             this.World.NewSandboxScene();
+
+            // Toggle the shared on-disk settings asset only after the throwing scene I/O above has succeeded, so a
+            // failure there never leaves the live feature disabled for the rest of the editor session.
+            this.originalEnabled = PreloadSettings.Instance.enabled;
+            PreloadSettings.Instance.enabled = false;
+            this.enabledToggled = true;
         }
 
         [TearDown]
         public void TearDown()
         {
-            this.World.Dispose();
-            this.World = null;
+            // Restore the shared settings asset first: it mutates global state, and World.Dispose /
+            // RestoreSceneManagerSetup below can throw and skip the rest of TearDown. Only restore if we actually
+            // toggled it, so a SetUp that failed before the toggle does not clobber the asset to a default false.
+            if (this.enabledToggled)
+            {
+                PreloadSettings.Instance.enabled = this.originalEnabled;
+                this.enabledToggled = false;
+            }
 
             if (this.originalSetup is { Length: > 0 })
             {
                 EditorSceneManager.RestoreSceneManagerSetup(this.originalSetup);
             }
 
-            PreloadSettings.Instance.enabled = this.originalEnabled;
+            if (this.World != null)
+            {
+                this.World.Dispose();
+                this.World = null;
+            }
         }
     }
 }
