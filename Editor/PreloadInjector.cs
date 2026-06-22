@@ -1,10 +1,10 @@
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
 namespace Vex.Preload.Editor
 {
-    using UnityEditor;
-    using UnityEditor.SceneManagement;
-    using UnityEngine;
-    using UnityEngine.SceneManagement;
-
     public static class PreloadInjector
     {
         public static bool EnsureHost(Scene scene)
@@ -37,21 +37,13 @@ namespace Vex.Preload.Editor
 
         internal static bool Ensure(Scene scene, GameObject prefab, PreloadKind kind)
         {
-            if (prefab == null || !scene.IsValid() || !scene.isLoaded)
-            {
-                return false;
-            }
+            if (prefab == null || !scene.IsValid() || !scene.isLoaded) return false;
 
             if (PreloadClassifier.ContainsKind(scene, kind) || PreloadClassifier.ContainsPrefab(scene, prefab))
-            {
                 return false;
-            }
 
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
-            if (instance == null)
-            {
-                return false;
-            }
+            if (instance == null) return false;
 
             EditorSceneManager.MarkSceneDirty(scene);
             return true;
@@ -59,25 +51,16 @@ namespace Vex.Preload.Editor
 
         private static void Stamp(GameObject prefab, PreloadKind kind)
         {
-            if (prefab == null)
-            {
-                return;
-            }
+            if (prefab == null) return;
 
             var path = AssetDatabase.GetAssetPath(prefab);
-            if (string.IsNullOrEmpty(path))
-            {
-                return;
-            }
+            if (string.IsNullOrEmpty(path)) return;
 
             var root = PrefabUtility.LoadPrefabContents(path);
             try
             {
                 var marker = root.GetComponent<PreloadMarker>();
-                if (marker == null)
-                {
-                    marker = root.AddComponent<PreloadMarker>();
-                }
+                if (marker == null) marker = root.AddComponent<PreloadMarker>();
 
                 marker.Kind = kind;
                 PrefabUtility.SaveAsPrefabAsset(root, path);

@@ -1,10 +1,10 @@
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
 namespace Vex.Preload.Editor
 {
-    using UnityEditor;
-    using UnityEditor.SceneManagement;
-    using UnityEngine;
-    using UnityEngine.SceneManagement;
-
     [InitializeOnLoad]
     public static class PreloadSceneHooks
     {
@@ -26,21 +26,12 @@ namespace Vex.Preload.Editor
 
         private static void MaybeInject(Scene scene)
         {
-            if (!ShouldConsider(scene))
-            {
-                return;
-            }
+            if (!ShouldConsider(scene)) return;
 
             var sceneClass = PreloadClassifier.Classify(scene);
-            if (sceneClass != SceneClass.Host && sceneClass != SceneClass.Blank)
-            {
-                return;
-            }
+            if (sceneClass != SceneClass.Host && sceneClass != SceneClass.Blank) return;
 
-            if (!PreloadInjector.EnsureHost(scene))
-            {
-                return;
-            }
+            if (!PreloadInjector.EnsureHost(scene)) return;
 
             var hint = sceneClass == SceneClass.Blank
                 ? " New scene — link a SubScene next (Vex > Preload > Create paired subscene)."
@@ -48,14 +39,10 @@ namespace Vex.Preload.Editor
             Debug.Log($"[Preload] '{SceneName(scene)}' was missing Required In Scene — added it for you.{hint}");
         }
 
-        // A scene is only a candidate for injection when preload is on, we are not entering/exiting play, the scene is
-        // real, and we are not in the middle of building (or looking at) the temp host.
         private static bool ShouldConsider(Scene scene)
         {
             if (!PreloadState.Enabled || EditorApplication.isPlayingOrWillChangePlaymode || !scene.IsValid())
-            {
                 return false;
-            }
 
             return !PreloadPlayGuard.IsBuilding && !PreloadPlayGuard.IsTempHost(scene);
         }

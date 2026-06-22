@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using BovineLabs.Core.Editor.Settings;
+using BovineLabs.Core.Settings;
+using UnityEditor;
+using UnityEngine;
+
 namespace Vex.Preload.Editor
 {
-    using System;
-    using System.Collections.Generic;
-    using BovineLabs.Core.Editor.Settings;
-    using BovineLabs.Core.Settings;
-    using UnityEditor;
-    using UnityEngine;
-
     [SettingsGroup("Vex")]
     public sealed class PreloadSettings : ScriptableObject, ISettings
     {
@@ -27,43 +27,26 @@ namespace Vex.Preload.Editor
 
         public static PreloadSettings Instance => EditorSettingsUtility.GetSettings<PreloadSettings>();
 
+        private void OnEnable()
+        {
+            if (hostPrefab == null) hostPrefab = LoadPrefab(HostPrefabGuid);
+
+            if (contentPrefab == null) contentPrefab = LoadPrefab(ContentPrefabGuid);
+        }
+
         public bool IsExcluded(string scenePath)
         {
-            if (string.IsNullOrEmpty(scenePath))
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(scenePath)) return false;
 
-            foreach (var folder in this.excludeFolders)
+            foreach (var folder in excludeFolders)
             {
-                if (string.IsNullOrEmpty(folder))
-                {
-                    continue;
-                }
+                if (string.IsNullOrEmpty(folder)) continue;
 
-                // Match on folder boundaries, not raw prefix: "Assets/Samples" excludes the folder itself and anything
-                // under it, but NOT a sibling like "Assets/SamplesOfMine" that merely shares a leading substring.
                 var trimmed = folder.TrimEnd('/');
-                if (scenePath == trimmed || scenePath.StartsWith(trimmed + "/", StringComparison.Ordinal))
-                {
-                    return true;
-                }
+                if (scenePath == trimmed || scenePath.StartsWith(trimmed + "/", StringComparison.Ordinal)) return true;
             }
 
             return false;
-        }
-
-        private void OnEnable()
-        {
-            if (this.hostPrefab == null)
-            {
-                this.hostPrefab = LoadPrefab(HostPrefabGuid);
-            }
-
-            if (this.contentPrefab == null)
-            {
-                this.contentPrefab = LoadPrefab(ContentPrefabGuid);
-            }
         }
 
         private static GameObject LoadPrefab(string guid)

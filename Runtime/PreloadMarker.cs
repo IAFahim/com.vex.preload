@@ -1,11 +1,11 @@
+using UnityEngine;
+
 namespace Vex.Preload
 {
-    using UnityEngine;
-
     public enum PreloadKind
     {
         Host,
-        Content,
+        Content
     }
 
     [DisallowMultipleComponent]

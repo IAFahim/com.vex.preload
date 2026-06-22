@@ -1,28 +1,28 @@
 {
-    "name": "Vex.Preload.Tests.Editor",
-    "rootNamespace": "Vex.Preload.Editor.Tests",
-    "references": [
-        "Vex.Preload",
-        "Vex.Preload.Editor",
-        "BovineLabs.Core",
-        "BovineLabs.Core.Editor",
-        "Unity.Scenes",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Vex.Preload.Tests.Editor",
+  "rootNamespace": "Vex.Preload.Editor.Tests",
+  "references": [
+    "Vex.Preload",
+    "Vex.Preload.Editor",
+    "BovineLabs.Core",
+    "BovineLabs.Core.Editor",
+    "Unity.Scenes",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

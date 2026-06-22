@@ -1,21 +1,21 @@
 {
-    "name": "Vex.Preload.Editor",
-    "rootNamespace": "Vex.Preload.Editor",
-    "references": [
-        "Vex.Preload",
-        "BovineLabs.Core",
-        "BovineLabs.Core.Editor",
-        "Unity.Scenes"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": false,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Vex.Preload.Editor",
+  "rootNamespace": "Vex.Preload.Editor",
+  "references": [
+    "Vex.Preload",
+    "BovineLabs.Core",
+    "BovineLabs.Core.Editor",
+    "Unity.Scenes"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }
