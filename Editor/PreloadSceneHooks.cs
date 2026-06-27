@@ -12,6 +12,12 @@ namespace Vex.Preload.Editor
         {
             EditorSceneManager.sceneOpened += OnSceneOpened;
             EditorSceneManager.newSceneCreated += OnNewSceneCreated;
+            // ponytail: CoreCLR/no-domain-reload — drop these subs before the assembly unloads or they accumulate per recompile (each scene-open injects N times). Upgrade path: [OnCodeUnloading].
+            AssemblyReloadEvents.beforeAssemblyReload += () =>
+            {
+                EditorSceneManager.sceneOpened -= OnSceneOpened;
+                EditorSceneManager.newSceneCreated -= OnNewSceneCreated;
+            };
         }
 
         private static void OnSceneOpened(Scene scene, OpenSceneMode mode)

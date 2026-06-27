@@ -23,6 +23,8 @@ namespace Vex.Preload.Editor
         static PreloadPlayGuard()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            // ponytail: CoreCLR/no-domain-reload — drop this sub before the assembly unloads or it accumulates per recompile (play guard fires N times). Upgrade path: [OnCodeUnloading].
+            AssemblyReloadEvents.beforeAssemblyReload += () => EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 
             EditorApplication.delayCall += DiscardStrayTempHostInEditMode;
         }
