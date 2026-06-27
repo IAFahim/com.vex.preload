@@ -1,3 +1,4 @@
+using Unity.Scripting.LifecycleManagement;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -6,18 +7,20 @@ using UnityEngine.SceneManagement;
 namespace Vex.Preload.Editor
 {
     [InitializeOnLoad]
-    public static class PreloadSceneHooks
+    public static partial class PreloadSceneHooks
     {
         static PreloadSceneHooks()
         {
             EditorSceneManager.sceneOpened += OnSceneOpened;
             EditorSceneManager.newSceneCreated += OnNewSceneCreated;
-            // ponytail: CoreCLR/no-domain-reload — drop these subs before the assembly unloads or they accumulate per recompile (each scene-open injects N times). Upgrade path: [OnCodeUnloading].
-            AssemblyReloadEvents.beforeAssemblyReload += () =>
-            {
-                EditorSceneManager.sceneOpened -= OnSceneOpened;
-                EditorSceneManager.newSceneCreated -= OnNewSceneCreated;
-            };
+        }
+
+        // CoreCLR/no-domain-reload: unsubscribe before this assembly unloads on a code reload, else each scene-open injects N times after N recompiles.
+        [OnCodeUnloading]
+        private static void OnCodeUnloading()
+        {
+            EditorSceneManager.sceneOpened -= OnSceneOpened;
+            EditorSceneManager.newSceneCreated -= OnNewSceneCreated;
         }
 
         private static void OnSceneOpened(Scene scene, OpenSceneMode mode)

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Unity.Scenes;
+using Unity.Scripting.LifecycleManagement;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,7 +10,7 @@ using UnityEngine.SceneManagement;
 namespace Vex.Preload.Editor
 {
     [InitializeOnLoad]
-    public static class PreloadPlayGuard
+    public static partial class PreloadPlayGuard
     {
         public const string TempHostRootName = "[Preload Host]";
         public const string TempHostPath = "Assets/Preload/~PreloadHost.unity";
@@ -23,11 +24,13 @@ namespace Vex.Preload.Editor
         static PreloadPlayGuard()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            // ponytail: CoreCLR/no-domain-reload — drop this sub before the assembly unloads or it accumulates per recompile (play guard fires N times). Upgrade path: [OnCodeUnloading].
-            AssemblyReloadEvents.beforeAssemblyReload += () => EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 
             EditorApplication.delayCall += DiscardStrayTempHostInEditMode;
         }
+
+        // CoreCLR/no-domain-reload: unsubscribe before this assembly unloads on a code reload, else the guard fires N times after N recompiles.
+        [OnCodeUnloading]
+        private static void OnCodeUnloading() => EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
 
         public static bool IsBuilding { get; private set; }
 
