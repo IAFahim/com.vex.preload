@@ -5,7 +5,8 @@
     "Vex.Preload",
     "BovineLabs.Core",
     "BovineLabs.Core.Editor",
-    "Unity.Scenes"
+    "Unity.Scenes",
+    "Unity.Cinemachine"
   ],
   "includePlatforms": [
     "Editor"
@@ -16,6 +17,12 @@
   "precompiledReferences": [],
   "autoReferenced": false,
   "defineConstraints": [],
-  "versionDefines": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.cinemachine",
+      "expression": "",
+      "define": "UNITY_CINEMACHINE"
+    }
+  ],
   "noEngineReferences": false
 }
