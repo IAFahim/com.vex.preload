@@ -1,0 +1,26 @@
+{
+  "name": "Vex.WorldSetup.Editor",
+  "rootNamespace": "",
+  "references": [
+    "BovineLabs.Core",
+    "BovineLabs.Core.Extensions",
+    "BovineLabs.Core.Extensions.Authoring",
+    "BovineLabs.Core.Editor",
+    "BovineLabs.Core.Authoring",
+    "Unity.Scenes",
+    "Unity.Entities",
+    "Unity.Collections",
+    "Vex.Preload.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
